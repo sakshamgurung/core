@@ -1552,7 +1552,7 @@ def acceptance(ctx):
 									[
 										({
 											'name': 'acceptance-tests',
-											'image': 'owncloudci/php:%s' % phpVersion,
+											'image': 'owncloudci/php:8.0',
 											'pull': 'always',
 											'environment': environment,
 											'commands': params['extraCommandsBeforeTestRun'] + [
@@ -2175,7 +2175,7 @@ def vendorbinPhpstan(phpVersion):
 def vendorbinBehat():
 	return [{
 		'name': 'vendorbin-behat',
-		'image': 'owncloudci/php:7.4',
+		'image': 'owncloudci/php:8.0',
 		'pull': 'always',
 		'environment': {
 			'COMPOSER_HOME': '/drone/src/.cache/composer'
