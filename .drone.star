@@ -1564,6 +1564,7 @@ def acceptance(ctx):
 									],
 									'services':
 										databaseService(db) +
+										occUpgradeService(isCLI) +
 										browserService(browser) +
 										emailService(params['emailNeeded']) +
 										ldapService(params['ldapNeeded']) +
@@ -1857,6 +1858,19 @@ def proxyService(proxyNeeded):
 		}]
 
 	return []
+
+def occUpgradeService(needed):
+	if not needed:
+		return []
+
+	return [{
+		'name': 'occupgrade',
+		'image': 'owncloudci/php:7.4',
+		'pull': 'always',
+		'command': [
+			'php -S occupgrade:8123 tests/acceptance/occUpgrade.php'
+		]
+	}]
 
 def webdavService(needed):
 	if not needed:
