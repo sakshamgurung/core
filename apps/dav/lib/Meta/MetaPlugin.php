@@ -21,6 +21,8 @@
 
 namespace OCA\DAV\Meta;
 
+use OCA\DAV\Meta\Entity\Property;
+use OCA\DAV\Meta\Entity\PropertyMapper;
 use OCP\Files\IRootFolder;
 use OCP\IUserSession;
 use Sabre\DAV\INode;
@@ -48,12 +50,18 @@ class MetaPlugin extends ServerPlugin {
 	 * @var IRootFolder
 	 */
 	private $rootFolder;
+	/**
+	 * @var PropertyMapper
+	 */
+	private $mapper;
 
 	public function __construct(IUserSession $userSession,
-								IRootFolder $rootFolder
+								IRootFolder $rootFolder,
+								PropertyMapper $mapper
 	) {
 		$this->userSession = $userSession;
 		$this->rootFolder = $rootFolder;
+		$this->mapper = $mapper;
 	}
 
 	/**
@@ -98,9 +106,17 @@ class MetaPlugin extends ServerPlugin {
 				return $baseFolder->getRelativePath($file->getPath());
 			});
 		} elseif ($node instanceof MetaFile){
-			$propFind->handle(self::VERSION_EDITED_BY_PROPERTYNAME, function () use ($node) {
-				// FIXME: get from storage of the $node required data
-				return "test1@owncloud.com";
+			/**
+			 * @var Property $createdByUserProperty
+			 */
+			$createdByUserProperty = $this->mapper->findByIdAndPropertyName(
+				$node->getContentDispositionFileName(),
+				self::VERSION_EDITED_BY_PROPERTYNAME
+			);
+			$propFind->handle(self::VERSION_EDITED_BY_PROPERTYNAME, function () use ($createdByUserProperty) {
+				if ($createdByUserProperty->getPropertyvalue()) {
+					return $createdByUserProperty->getPropertyvalue();
+				}
 			});
 		}
 	}
